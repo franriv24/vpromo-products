@@ -1,24 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { formatPrice } from '../utils/formatters';
 
 const ProductsList = () => {
-  const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const limit = 10;
+  const [productList, setProductList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const rowsPerPage = 10;
 
-  const onPaginationPrev = () => setPage((prev) => Math.max(prev - 1, 1));
-  const onPaginationNext = () => setPage((prev) => Math.min(prev + 1, totalPages));
+  const onPaginationPrev = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const onPaginationNext = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   useEffect(() => {
-    fetch(`http://localhost:4000/products?page=${page}&limit=${limit}`)
-      .then((response) => {
-        setProducts(response.data.products);
-        setTotal(response.data.total);
+    fetch(`http://localhost:4000/products?page=${currentPage}&limit=${rowsPerPage}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const { products, total } = data;
+        setProductList(products);
+        setTotalPages(Math.ceil(total / rowsPerPage));
       })
       .catch((error) => console.error('Error fetching products:', error));
-  }, [page]);
-
-  const totalPages = Math.ceil(total / limit);
+  }, [currentPage]);
 
   return (
     <div className="products-container">
@@ -32,11 +33,11 @@ const ProductsList = () => {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {productList.map((product) => (
             <tr key={product.id}>
               <td>{product.id}</td>
               <td>{product.name}</td>
-              <td>${product.price}</td>
+              <td>{formatPrice(product.price)}</td>
             </tr>
           ))}
         </tbody>
@@ -45,17 +46,17 @@ const ProductsList = () => {
         <button
           className="pagination-button"
           onClick={onPaginationPrev}
-          disabled={page === 1}
+          disabled={currentPage === 1}
         >
           Anterior
         </button>
         <span className="pagination-info">
-          Página {page} de {totalPages}
+          Página {currentPage} de {totalPages}
         </span>
         <button
           className="pagination-button"
           onClick={onPaginationNext}
-          disabled={page === totalPages}
+          disabled={currentPage === totalPages}
         >
           Próxima
         </button>
