@@ -2,6 +2,8 @@
 
 Aplicativo de listagem de produtos, com o backend desenvolvido em NestJS e o frontend em ReactJS.
 
+![Logo do Projeto](listagem_produtos.png)
+
 ## Requisitos
 
 Antes de começar, você vai precisar ter as seguintes ferramentas instaladas em sua máquina:
